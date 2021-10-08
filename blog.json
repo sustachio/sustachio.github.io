@@ -1,0 +1,14 @@
+{
+"pages":
+    {
+        "home":
+        {
+            "header":"homepage"
+        },
+
+        "stuff":
+        {
+            "header":"more stuff"
+        }
+    }
+}
