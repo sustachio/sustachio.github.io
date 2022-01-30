@@ -1,39 +1,88 @@
-<html><head>
-    <title>Berlin Wall</title>
-    <link type="text/css" rel="stylesheet" href="styles/styles.css">
-    <script src="scripts/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="scripts/scripts.js"></script>
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | SwipSwap</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
   </head>
   <body>
-    <ul class="top-bar">
-      <li class="bar-item"><a class="active" href="index.html">Home</a></li>
-      <li class="bar-item"><a href="berlin.html">Berlin</a></li>
-      <li class="bar-item"><a href="facts.html">Facts</a></li>
-      <li class="dropdown">
-        <button class="dropdown-button">Sources</button>
-        <div class="dropdown-content">
-          <a target="_blank" href="https://www.britannica.com/topic/Berlin-Wall">Britannica</a>
-                <a target="_blank" href="https://www.ducksters.com/history/cold_war/berlin_wall.php">Ducksters</a>
-                <a target="_blank" href="https://www.nationalgeographic.com/history/article/why-berlin-wall-built-fell">National Geographic</a>
-                <a target="_blank" href="https://www.cnn.com/2013/09/15/world/europe/berlin-wall-fast-facts/index.html">CNN</a>
-        </div>
-      </li>
-    </ul>
-    
-    <div id="main-content">
-      <h1>Berlin Wall</h1>
-      <a class="page-link" href="howtouse.html" style="font-size:20px">How to use this site</a>
-      <div class="box">
-        <div class="top">What was the Berlin wall?</div>
-        <div class="main">The Berlin wall was a wall that separated the two sides of berlin.<br> It was built in 1961 and taken down in 1989. <br><br>It started as a barbed 
-          wire fence, but was later rebuilt with concrete blocks that were 12 feet high and four feet wide.</div>
-      </div>
-      <div class="box">
-        <div class="top">Why was it built?</div>
-        <div class="main">Before the Berlin Wall was built, around 2.5 million East Germans had fled to West Germany. This was not good for the Soviet Union, 
-          because they were losing a lot of workers. <br><br> In response to all of the people leaving they built the Berlin wall. The wall was very hard to pass 
-          because it was guarded by a lot of soldiers. The wall made sure that barley anyone could escape Soviet-controlled East Berlin.
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width=960 height=600></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
         </div>
       </div>
-    </div>    
-</body></html>
+      <div id="unity-mobile-warning">
+        WebGL builds are not supported on mobile devices.
+      </div>
+      <div id="unity-footer">
+        <div id="unity-webgl-logo"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">SwipSwap</div>
+      </div>
+    </div>
+    <script>
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/sustachio.github.io.loader.js";
+      var config = {
+        dataUrl: buildUrl + "/sustachio.github.io.data.br",
+        frameworkUrl: buildUrl + "/sustachio.github.io.framework.js.br",
+        codeUrl: buildUrl + "/sustachio.github.io.wasm.br",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "DefaultCompany",
+        productName: "SwipSwap",
+        productVersion: "1.0",
+      };
+
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+      var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+      var mobileWarning = document.querySelector("#unity-mobile-warning");
+
+      // By default Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        container.className = "unity-mobile";
+        // Avoid draining fillrate performance on mobile devices,
+        // and default/override low DPI mode on mobile browsers.
+        config.devicePixelRatio = 1;
+        mobileWarning.style.display = "block";
+        setTimeout(() => {
+          mobileWarning.style.display = "none";
+        }, 5000);
+      } else {
+        canvas.style.width = "960px";
+        canvas.style.height = "600px";
+      }
+      canvas.style.background = "url('" + buildUrl + "/sustachio.github.io.jpg') center / cover";
+      loadingBar.style.display = "block";
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          progressBarFull.style.width = 100 * progress + "%";
+        }).then((unityInstance) => {
+          loadingBar.style.display = "none";
+          fullscreenButton.onclick = () => {
+            unityInstance.SetFullscreen(1);
+          };
+        }).catch((message) => {
+          alert(message);
+        });
+      };
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>
